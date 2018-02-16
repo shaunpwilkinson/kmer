@@ -5,19 +5,37 @@
 
 using namespace Rcpp;
 
-// rcpp_hello
-List rcpp_hello();
-RcppExport SEXP _kmer_rcpp_hello() {
+// kcountDNA
+NumericMatrix kcountDNA(List x, int k);
+RcppExport SEXP _kmer_kcountDNA(SEXP xSEXP, SEXP kSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(rcpp_hello());
+    Rcpp::traits::input_parameter< List >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(kcountDNA(x, k));
+    return rcpp_result_gen;
+END_RCPP
+}
+// kdist
+NumericMatrix kdist(NumericMatrix x, IntegerVector from, IntegerVector to, IntegerVector seqlengths, int k);
+RcppExport SEXP _kmer_kdist(SEXP xSEXP, SEXP fromSEXP, SEXP toSEXP, SEXP seqlengthsSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type from(fromSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type to(toSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type seqlengths(seqlengthsSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(kdist(x, from, to, seqlengths, k));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_kmer_rcpp_hello", (DL_FUNC) &_kmer_rcpp_hello, 0},
+    {"_kmer_kcountDNA", (DL_FUNC) &_kmer_kcountDNA, 2},
+    {"_kmer_kdist", (DL_FUNC) &_kmer_kdist, 5},
     {NULL, NULL, 0}
 };
 

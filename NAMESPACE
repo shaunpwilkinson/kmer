@@ -1,3 +1,12 @@
 exportPattern("^[[:alpha:]]+")
+
+importFrom(stats, as.dist)
+importFrom(stats, dendrapply)
+importFrom(stats, dist)
+importFrom(stats, is.leaf)
+importFrom(stats, kmeans)
+importFrom(phylogram, remidpoint)
+importFrom(phylogram, reposition)
 importFrom(Rcpp, evalCpp)
+
 useDynLib(kmer)

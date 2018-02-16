@@ -1,13 +1,29 @@
 Package: kmer
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: K-mer Counting and Clustering for Biological Sequence Analysis
+Version: 0.0.0.9000
+Authors@R: person("Shaun", "Wilkinson", role = c("aut", "cre"),
+                     email = "shaunpwilkinson@gmail.com")
+Author: Shaun Wilkinson [aut, cre]
+Maintainer: Shaun Wilkinson <shaunpwilkinson@gmail.com>
+Description: Contains a suite of tools for rapidly computing 
+    distance matrices and building large trees using fast alignment-free 
+    'k-mer' counting and divisive clustering techniques.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Imports: Rcpp (>= 0.12.13)
+URL: http://github.com/shaunpwilkinson/kmer
+BugReports: http://github.com/shaunpwilkinson/kmer/issues
+Imports: 
+    openssl,
+    phylogram,
+    Rcpp (>= 0.12.13),
+    stats
+Suggests:
+    ape (>= 4.0),
+    knitr,
+    rmarkdown,
+    testthat
 LinkingTo: Rcpp
+VignetteBuilder: knitr
+RoxygenNote: 6.0.1

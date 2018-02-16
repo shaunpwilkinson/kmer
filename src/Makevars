@@ -1,0 +1,2 @@
+## C++11 necessary to avoid 'long long int' compilation error
+CXX_STD = CXX11
