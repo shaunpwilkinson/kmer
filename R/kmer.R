@@ -1,9 +1,8 @@
 #' K-mer Counting and Clustering for Biological Sequence Analysis.
 #'
-#' The kmer package contains a suite of tools for rapidly
-#' computing distance matrices
-#' and building large trees using fast alignment-free k-mer counting
-#' and divisive clustering techniques.
+#' The kmer package contains a suite of tools for rapidly computing
+#' distance matrices and building large trees using fast alignment-free
+#' k-mer counting and divisive clustering techniques.
 #'
 #' @section Functions:
 #' A breif description of the primary \pkg{kmer} functions are
