@@ -1,0 +1,167 @@
+---
+title: "K-mer counting and clustering for biological sequence analysis"
+author: "Shaun Wilkinson"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+bibliography: kmer.bib
+csl: bioinformatics.csl
+vignette: >
+  %\VignetteIndexEntry{Introduction to the kmer package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+#knitr::opts_chunk$set(out.width='750px', dpi=200)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+--------------------------------------------------------------------------------
+## Abstract
+**Summary:** `kmer` is an R package for rapidly computing distance matrices and 
+clustering sequence datasets using fast alignment-free *k*-mer counting.
+This package has a range of potential applications including 
+OTU clustering, classification & regression trees, and phylogenetic 
+analysis of very large biological sequence datasets.  
+**Availability and Implementation:** The `kmer` package is 
+released underthe GPL-3 license, and is available for download from 
+CRAN <https://CRAN.R-project.org/package=kmer> and github 
+<https://github.com/shaunpwilkinson/kmer>.  
+**Contact:** shaunpwilkinson\@gmail.com
+
+
+## The 'kmer' package
+Here, we introduce `kmer`, an R package for 
+computing distance matrices and clustering sequence datasets by 
+fast alignment-free k-mer counting, in other words, counting all 
+k-letter words in a sequence using a sliding window.
+A primary focus of this package is to facilitate the assembly 
+of very large trees as quickly and efficiently as possible. This can be 
+achieved with or without a multiple sequence alignment, and with or without
+a matrix of pairwise distances.
+These functions are detailed below with examples of their utility.
+
+
+### Distance matrix computation
+The `kmer` package features the function `kcount` for counting 
+*k*-mers within a sequence or set of sequences, and `kdistance` for computing 
+a fast, alignment-free *k*-mer distance matrix. 
+This is achieved by sliding a window of length *k* along each sequence, 
+counting the number of times each *k*-mer appears 
+(for example, the $4^3$ possible DNA 3-mers: AAA, AAC, AAG, ..., TTT),
+and using these counts to derive the pairwise distances. 
+The default distance metric used by `kdistance` is the 
+*k*-mer (*k*-tuple) distance measure outlined in Edgar [-@Edgar2004c].
+For two DNA sequences $a$ and $b$, the fractional common *k*-mer count over the 
+$4^k$ possible words of length $k$ is calculated as:
+$$F  = \sum\limits_{\tau}\frac{min (n_a(\tau), n_b (\tau))}{min (L_a , L_b ) - k + 1} \tag{1}$$
+
+where $\tau$ represents each possible *k*-mer, 
+$n_a(\tau)$ and $n_b(\tau)$ 
+are the number of times $\tau$ appears in each sequence, 
+$k$ is the *k*-mer length and $L$ is the sequence length. 
+The pairwise distance between $a$ and $b$ is then calculated as: 
+
+$$d = \frac{log(0.1 + F) - log(1.1)}{log(0.1)} \tag{2}$$
+
+For $n$ sequences, the `kdistance` operation has time and memory 
+complexity $O(n^2)$ and thus can become computationally infeasible 
+when the sequence set is large (i.e. more than ~ 10,000 sequences).
+As such, the `kmer` package also offers the function `mbed`, that 
+only computes the distances from each sequence to a smaller (or equal) 
+sized subset of 'seed' sequences [@Blackshields2010]. 
+The default behavior of the `kdistance` function is to select 
+$t = (log_2n)^2$ seeds by clustering the sequences 
+(*k*-means algorithm with $k = t$), and selecting one
+representative sequence from each cluster. 
+ 
+DNA and amino acid sequences can be passed to `kcount`, `kdistance` and `mbed` 
+either as a list of non-aligned sequences or a matrix of aligned sequences, 
+preferably in either the "DNAbin" or "AAbin" raw-byte format (see the 
+**ape** package documentation for more information on these S3 classes). 
+Character sequences are supported; however ambiguity 
+codes may not be recognized or treated appropriately, since raw ambiguities 
+are counted according to their underlying residue frequencies
+(e.g. the 5-mer "ACRGT" would contribute 0.5 to the tally for "ACAGT" 
+and 0.5 to that of "ACGGT"). This excludes the ambiguity code "N", which 
+is ignored.
+
+#### Example 3: Compute *k*-mer distance matrices for the woodmouse dataset
+The **ape** package contains a dataset of 15 aligned mitochondrial 
+cytochrome *b* gene DNA sequences from the woodmouse *Apodemus sylvaticus*. 
+This is a subset of those originally published in 
+Michaux et al. [-@Michaux2003].
+While the `kmer` distance functions do not require sequences to 
+be aligned, this example will enable us to compare our *k*-mer distances
+with the traditional alignment-reliant distances produced by 
+`ape::dist.dna`. First, load the dataset as follows:
+
+```{r}
+library(ape)
+data(woodmouse)
+## view the first few rows and columns 
+as.character.DNAbin(woodmouse[1:5, 1:5])
+```
+
+
+This is a semi-global ('glocal') alignment featuring some 
+incomplete sequences, with unknown characters represented by 
+the ambiguity code "n" (e.g. No305). 
+To avoid artificially inflating the distances between these partial 
+sequences and the others, we first trim the gappy ends by subsetting 
+the global alignment (note that the **ape** function `dist.dna` 
+also removes columns with ambiguity codes prior to distance computation 
+by default ).
+
+```{r}
+woodmouse <- woodmouse[, apply(woodmouse, 2, function(v) !any(v == 0xf0))]
+```
+
+The following code first computes the full $n \times n$ distance matrix, 
+and then the embedded distances of each sequence to three randomly selected 
+seed sequences. 
+In both cases the *k*-mer size is set to 5.
+
+```{r}
+### Compute the full distance matrix and print the first few rows and columns
+woodmouse.kdist <- kmer::kdistance(woodmouse, k = 5)
+print(as.matrix(woodmouse.kdist)[1:7, 1:7], digits = 2)
+
+### Compute and print the embedded distance matrix
+set.seed(999)
+seeds <- sample(1:15, size = 3)
+woodmouse.mbed <- kmer::mbed(woodmouse, seeds = seeds, k = 5)
+### remove the attributes for printing by subsetting the distance matrix
+print(woodmouse.mbed[,], digits = 2)
+```
+
+
+### Building trees
+To avoid excessive time and memory use when building large trees 
+(e.g. *n* > 10,000), the `kmer` package features the 
+function `cluster` for divisive tree building, free of both alignment 
+and distance matrix computation. 
+This function first generates a matrix of *k*-mer counts, 
+and then recursively partitions the sequences using successive 
+k-means clustering (*k* = 2). 
+While this method may not necessarily 
+reconstruct sufficiently accurate phylogenetic trees for taxonomic 
+purposes, it offers a fast and efficient means of producing large trees 
+for a variety of other applications. 
+These include tree-based sequence weighting (e.g. Gerstein et al. [-@Gerstein1994]), 
+guide trees for progressive multiple sequence alignment (e.g. Sievers 
+et al. [-@Sievers2011]), and other recursive operations such as
+classification and regression tree learning.
+
+The top-down and neighbor-joining trees show relatively congruent fine-scale 
+topologies, regardless of the distance measure and method used.
+However, for large sequence sets, the top-down (divisive) method builds trees 
+orders of magnitude faster than 
+traditional alignment and distance matrix-based methods, since computation 
+time and memory use increasing linearly rather than quadratically with *n*.
+
+## Acknowledgements 
+This software was developed with funding from a Rutherford Foundation Postdoctoral 
+Research Fellowship from the Royal Society of New Zealand.
+
+## References 
