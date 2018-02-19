@@ -4,12 +4,12 @@
 \name{kmer}
 \alias{kmer}
 \alias{kmer-package}
-\title{K-mer Counting and Clustering for Biological Sequence Analysis.}
+\title{Fast K-mer Counting and Clustering for Biological Sequence Analysis.}
 \description{
-The kmer package contains a suite of tools for rapidly
-computing distance matrices
-and building large trees using fast alignment-free k-mer counting
-and divisive clustering techniques.
+The kmer package contains tools for rapidly computing
+  distance matrices, building large trees, and clustering
+  operational taxonomic units using fast alignment-free
+  k-mer counting and divisive clustering techniques.
 }
 \section{Functions}{
 
@@ -21,7 +21,8 @@ A breif description of the primary \pkg{kmer} functions are
 
 \itemize{
 \item \code{\link{kcount}} counts all k-letter words in a
-  sequence using a sliding window of length k
+  sequence or set of sequences using a sliding window of
+  length k
 }
 }
 
@@ -42,7 +43,7 @@ A breif description of the primary \pkg{kmer} functions are
   successively splitting a set of sequences
   (recursive partitioning) based on k-mer counts
 \item \code{\link{otu}} heirarchically clusters a set of sequences
-  until a predefined maximum dissimilarity threshold is reached.
+  until a predefined furthest neighbor dissimilarity threshold is reached.
 }
 }
 
