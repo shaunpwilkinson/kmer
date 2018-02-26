@@ -236,29 +236,22 @@
   return(res)
 }
 
-# Return MD5 hash
-.digest <- function(x, simplify = TRUE){
+# Find MD5 hash
+.digest <- function(x){
   digest1 <- function(s){
     if(mode(s) != "raw"){
       if(mode(s) == "character"){
-        s <- sapply(s, charToRaw)
+        s <- charToRaw(paste0(s, collapse = ""))
       }else if(mode(s) == "integer"){
-        s <- sapply(s, as.raw)
-      }else if(mode(s) == "numeric"){
-        s <- unlist(sapply(s, function(a) charToRaw(paste(round(a, 4)))), use.names = FALSE)
-        #stop("Can't digest numeric vectors")
-      }
+        s <- as.raw(s)
+      }else stop("x must be raw, character or integer\n")
     }
     return(paste(openssl::md5(as.vector(s))))
   }
-  if(is.list(x)){
-    if(simplify) return(sapply(x, digest1)) else return(lapply(x, digest1))
-  }else{
-    return(digest1(x))
-  }
+  sapply(x, digest1)
 }
 
-
+# Find re-replication indices
 .point <- function(h){
   uh <- unique(h)
   pointers <- seq_along(uh)

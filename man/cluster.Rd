@@ -2,7 +2,7 @@
 % Please edit documentation in R/cluster.R
 \name{cluster}
 \alias{cluster}
-\title{Top down (divisive) tree-building.}
+\title{Divisive k-means clustering.}
 \usage{
 cluster(x, k = 5, residues = NULL, gap = "-", ...)
 }
@@ -30,8 +30,8 @@ Defaults to "-" otherwise.}
 Returns an object of class \code{"dendrogram"}.
 }
 \description{
-Create phylogenetic trees by successively splitting the sequence dataset
-  into smaller and smaller subsets.
+This function recursively splits a sequence set into smaller and smaller subsets,
+returning a "dendrogram" object.
 }
 \details{
 This function creates a tree by successively splitting

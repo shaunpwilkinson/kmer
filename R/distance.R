@@ -376,22 +376,12 @@ mbed <- function(x, seeds = NULL, k = 5, residues = NULL, gap = "-",
               max(seeds) <= nseq,
               min(seeds) > 0)
   }
-  hashes <- .digest(x, simplify = TRUE)
+  hashes <- .digest(x)
   duplicates <- duplicated(hashes)
   nuseq <- sum(!duplicates)
-  if(any(duplicates)){
-    pointers <- integer(length(x))
-    dupehashes <- hashes[duplicates]
-    uniquehashes <- hashes[!duplicates]
-    pointers[!duplicates] <- seq_along(uniquehashes)
-    pd <- integer(length(dupehashes))
-    for(i in unique(dupehashes)) pd[dupehashes == i] <- match(i, uniquehashes)
-    pointers[duplicates] <- pd
-    catchnames <- names(x)
-    x <- x[!duplicates]
-  }else{
-    pointers <- seq_along(x)
-  }
+  pointers <- .point(hashes)
+  catchnames <- names(x)
+  x <- x[!duplicates]
   seqalongx <- seq_along(x)
   if(DNA){
     x <- lapply(x, function(s) s[!(s %in% as.raw(c(2, 4, 240)))])

@@ -1,7 +1,7 @@
-#' Top down (divisive) tree-building.
+#' Divisive k-means clustering.
 #'
-#' Create phylogenetic trees by successively splitting the sequence dataset
-#'   into smaller and smaller subsets.
+#' This function recursively splits a sequence set into smaller and smaller subsets,
+#' returning a "dendrogram" object.
 #'
 #' @param x a list or matrix of sequences, possibly an object of class
 #'   \code{"DNAbin"} or \code{"AAbin"}.
@@ -105,11 +105,14 @@ cluster <- function(x, k = 5, residues = NULL, gap = "-", ...){
     class(tree) <- "dendrogram"
     return(tree)
   }
-  # stop("Only a single sequence provided")
   if(is.null(names(x))) names(x) <- paste0("S", 1:nseq)
   catchnames <- names(x)
-  hashes <- .digest(x, simplify = TRUE)
+  hashes <- .digest(x)
   duplicates <- duplicated(hashes)
+  nuseq <- sum(!duplicates)
+  pointers <- .point(hashes)
+  x <- x[!duplicates]
+  xlengths <- sapply(x, length)
   if(sum(!duplicates) == 1){
     tree <- vector(mode = "list", length = length(x))
     attr(tree, "height") <- 0
@@ -126,35 +129,19 @@ cluster <- function(x, k = 5, residues = NULL, gap = "-", ...){
     class(tree) <- "dendrogram"
     return(tree)
   }
-  nuseq <- sum(!duplicates)
-  if(any(duplicates)){
-    pointers <- integer(length(x))
-    dupehashes <- hashes[duplicates]
-    uniquehashes <- hashes[!duplicates]
-    pointers[!duplicates] <- seq_along(uniquehashes)
-    pd <- integer(length(dupehashes))
-    for(i in unique(dupehashes)) pd[dupehashes == i] <- match(i, uniquehashes)
-    pointers[duplicates] <- pd
-    x <- x[!duplicates]
-  }else{
-    pointers <- seq_along(x)
-  }
   kcounts <- kcount(x, k = k, residues = residues, gap = gap, named = FALSE)
-  kfreqs <- kcounts/apply(kcounts, 1, sum)
   tree <- 1
   attr(tree, "leaf") <- TRUE
   attr(tree, "sequences") <- 1:nuseq
   attr(tree, "height") <- 0
+  attr(tree, "kvector") <- apply(kcounts, 2, mean)
+  attr(tree, "meanlength") <- mean(xlengths)
   ## define recursive splitting functions
-  cluster1 <- function(tree, d, ...){ # d is the kfreq matrix
-    tree <- cluster2(tree, d = d, ... = ...)
-    if(is.list(tree)) tree[] <- lapply(tree, cluster1, d = d, ... = ...)
-    return(tree)
-  }
-  cluster2 <- function(node, d, ...){
+  clustern <- function(node, kcs, seqlengths, k, ...){
     if(!is.list(node) & length(attr(node, "sequences")) > 1){
       ## fork leaves only
-      seqs <- d[attr(node, "sequences"), , drop = FALSE]
+      seqs <- kcs[attr(node, "sequences"), , drop = FALSE]
+      lens <- seqlengths[attr(node, "sequences")]
       errfun <- function(er){## used when >3 uniq hashes but kmeans throws error
         out <- list()
         nrs <- nrow(seqs)
@@ -165,49 +152,41 @@ cluster <- function(x, k = 5, residues = NULL, gap = "-", ...){
                              apply(seqs[cls == 2, , drop = FALSE], 2, mean))
         return(out)
       }
-      km <- if(nrow(seqs) > 2) {
-        tryCatch(kmeans(seqs, centers = 2, ... = ...), error = errfun, warning = errfun)
+      km <- if(nrow(seqs) > 2){
+        tryCatch(kmeans(seqs, centers = 2, ... = ...),
+                 error = errfun, warning = errfun)
       }else{
         list(cluster = 1:2, centers = seqs)
       }
-      membership <- km$cluster
-      centers <- km$centers
       tmpattr <- attributes(node)
       node <- vector(mode = "list", length = 2)
       attributes(node) <- tmpattr
       attr(node, "leaf") <- NULL
-      attr(node, "avdist") <- sqrt(sum(abs(km$centers[1,] - km$centers[2,])^2))
       for(i in 1:2){
         node[[i]] <- 1
-        attr(node[[i]], "height") <- attr(node, "height") - 0.0001 ## cleaned up later
+        attr(node[[i]], "kvector") <- km$centers[i, ]
+        attr(node[[i]], "meanlength") <- mean(lens[km$cluster == i])
+        kmatrix <- rbind(attr(node, "kvector"), attr(node[[i]], "kvector"))
+        rownames(kmatrix) <- paste(1:2) # needed for c++ function
+        meanlengths <- c(attr(node, "meanlength") , attr(node[[i]], "meanlength"))
+        diffheight <- .kdist(kmatrix, from = 0, to = 1, seqlengths = meanlengths, k = k)[1]
+        attr(node[[i]], "height") <- attr(node, "height") - diffheight ## cleaned up later
         attr(node[[i]], "leaf") <- TRUE
-        attr(node[[i]], "sequences") <- attr(node, "sequences")[membership == i]
-        attr(node[[i]], "avdist") <- 0 ## recalculated later if subnode is list
+        attr(node[[i]], "sequences") <- attr(node, "sequences")[km$cluster == i]
       }
     }
     return(node)
   }
+  clusterr <- function(tree, kcs, seqlengths, k, ...){ # kcs is the kfreq matrix
+    tree <- clustern(tree, kcs, seqlengths, k, ...)
+    if(is.list(tree)) tree[] <- lapply(tree, clusterr, kcs, seqlengths, k, ...)
+    return(tree)
+  }
   ##  build tree recursively
-  tree <- cluster1(tree, d = kfreqs)
+  tree <- clusterr(tree, kcs = kcounts, seqlengths = xlengths, k = k, ... = ...)
   tree <- phylogram::remidpoint(tree)
   class(tree) <- "dendrogram"
-  reheight <- function(node){
-    if(is.list(node)){
-      ## arbitrary minimum branch length of 0.0001
-      node1edge <- max(0.0001, (attr(node, "avdist") - attr(node[[1]], "avdist"))/2)
-      node2edge <- max(0.0001, (attr(node, "avdist") - attr(node[[2]], "avdist"))/2)
-      attr(node[[1]], "height") <- attr(node, "height") - node1edge
-      attr(node[[2]], "height") <- attr(node, "height") - node2edge
-    }
-    attr(node, "avdist") <- NULL ## tidy up by removing attrs
-    return(node)
-  }
-  reheight1 <- function(node){
-    node <- reheight(node)
-    if(is.list(node)) node[] <- lapply(node, reheight1)
-    return(node)
-  }
-  tree <- reheight1(tree)
+  tree <- phylogram::reposition(tree)
   class(tree) <- "dendrogram"
   tree <- phylogram::reposition(tree)
   if(any(duplicates)){

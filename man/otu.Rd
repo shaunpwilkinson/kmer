@@ -4,7 +4,7 @@
 \alias{otu}
 \title{Cluster sequences into operational taxonomic units.}
 \usage{
-otu(x, k = 5, threshold = 0.97, ...)
+otu(x, k = 5, threshold = 0.97)
 }
 \arguments{
 \item{x}{a "DNAbin" object.}
@@ -13,8 +13,6 @@ otu(x, k = 5, threshold = 0.97, ...)
 for k-means clustering.}
 
 \item{threshold}{numeric between 0 and 1 giving the OTU similarity cutoff.}
-
-\item{...}{further arguments to be passed to \code{kmeans}.}
 }
 \value{
 an integer vector of cluster membership with values from 1 to
