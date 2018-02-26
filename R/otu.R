@@ -23,7 +23,7 @@ otu <- function(x, k = 5, threshold = 0.97){
   pointers <- .point(hashes)
   x <- x[!duplicated(hashes)]
   xlengths <- sapply(x, length)
-  kcounts <- as.data.frame(phylogram::kcount(x, k = k))
+  kcounts <- as.data.frame(kcount(x, k = k))
   tree <- 1
   attr(tree, "leaf") <- TRUE
   attr(tree, "sequences") <- seq_along(x)
