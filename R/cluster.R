@@ -24,7 +24,7 @@
 #'   partitioning). This is a divisive, or "top-down" approach to tree-building,
 #'   as opposed to agglomerative "bottom-up" methods such as neighbour joining
 #'   and UPGMA. It is particularly useful for large large datasets with many sequences
-#'   (\emph{n} > 10, 000) since the need to compute a large \emph{n} * \emph{n}
+#'   (\emph{n} > 10,000) since the need to compute a large \emph{n} * \emph{n}
 #'   distance matrix is circumvented.
 #'   Instead, a matrix of k-mer counts is computed, and split recursively row-wise
 #'   using a k-means clustering algorithm (\emph{k} = 2). This effectively reduces
@@ -225,9 +225,13 @@ cluster <- function(x, k = 5, residues = NULL, gap = "-", ...){
       tmpattr <- attributes(node)
       node[] <- tmpattr$sequences
       tmpattr$sequences <- NULL
+      tmpattr$kvector <- NULL
+      tmpattr$meanlength <- NULL
       attributes(node) <- tmpattr
     }else{
       attr(node, "sequences") <- NULL
+      attr(node, "kvector") <- NULL
+      attr(node, "meanlength") <- NULL
     }
     return(node)
   }

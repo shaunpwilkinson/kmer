@@ -259,3 +259,35 @@
   unname(pointers[h])
 }
 
+.farthest2 <- function(y, k, seqlengths){ # y is a kcount (or other) matrix
+  y <- as.matrix(y) # in case y is a df
+  point1 <- sample(1:nrow(y), size = 1)
+  checked <- integer(100)
+  checked[1] <- point1
+  dists <- .kdist(y, from = 1:nrow(y) - 1, to = point1 - 1,
+                  seqlengths = seqlengths, k = k)[, 1]
+  point2 <- which.max(dists)
+  for(i in 2:100){
+    dists <- .kdist(y, from = 1:nrow(y) - 1, to = point2 - 1,
+                    seqlengths = seqlengths, k = k)[, 1]
+    point3 <- which.max(dists)
+    if(point3 %in% checked) break
+    point1 <- point2
+    checked[i] <- point1
+    point2 <- point3
+  }
+  if(i == 100) stop("Farthest distances not found\n")
+  res <- c(point2, point3)
+  attr(res, "distance") <- unname(dists[point3])
+  return(res)
+}
+
+.central1 <- function(y, k, seqlengths){
+  y <- as.matrix(y) # in case y is a df
+  means <- apply(y, 2, mean)
+  y2 <- rbind(means, y)
+  dists <- kmer:::.kdist(y2, from = 0, to = 1:nrow(y),
+                         seqlengths = c(mean(seqlengths), seqlengths),
+                         k = k)[1, ]
+  which.min(dists)
+}
