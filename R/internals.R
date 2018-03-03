@@ -286,8 +286,8 @@
   y <- as.matrix(y) # in case y is a df
   means <- apply(y, 2, mean)
   y2 <- rbind(means, y)
-  dists <- kmer:::.kdist(y2, from = 0, to = 1:nrow(y),
-                         seqlengths = c(mean(seqlengths), seqlengths),
-                         k = k)[1, ]
+  dists <- .kdist(y2, from = 0, to = 1:nrow(y),
+                  seqlengths = c(mean(seqlengths), seqlengths),
+                  k = k)[1, ]
   which.min(dists)
 }
