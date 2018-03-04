@@ -57,6 +57,15 @@ y.tree <- cluster(y, nstart = 20, k = 2)
 set.seed(999)
 yAA.tree <- cluster(yAA, nstart = 20, k = 2)
 
+# OTU clustering
+set.seed(999)
+x.otu <- otu(x, nstart = 20)
+set.seed(999)
+xDNA.otu <- otu(xDNA, nstart = 20)
+set.seed(999)
+y.otu <- otu(y, nstart = 20, k = 2)
+set.seed(999)
+yAA.otu <- otu(yAA, nstart = 20, k = 2)
 
 test_that("objects have correct classes", {
   expect_is(x.dist, "dist")
@@ -76,6 +85,8 @@ test_that("character and DNAbin formats give same results", {
   expect_equal(y.mbed[,], yAA.mbed[,])
   expect_equal(x.tree, xDNA.tree)
   expect_equal(y.tree, yAA.tree)
+  expect_equal(x.otu, xDNA.otu)
+  expect_equal(y.otu, yAA.otu)
 })
 
 test_that("object dimensions are correct", {
@@ -86,4 +97,6 @@ test_that("object dimensions are correct", {
   expect_equal(ncol(y.mbed), 9)
   expect_equal(length(x.tree), 2)
   expect_equal(length(y.tree), 2)
+  expect_equal(length(x.otu), 10)
+  expect_equal(length(y.otu), 10)
 })
