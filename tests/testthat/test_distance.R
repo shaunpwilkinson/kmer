@@ -31,6 +31,12 @@ xDNA.kcounts <- kcount(xDNA)
 y.kcounts <- kcount(y, k = 2)
 yAA.kcounts <- kcount(yAA, k = 2)
 
+# test Dayhoff compression
+tmp <- yAA
+tmp[1] <- charToRaw("X")
+tmp.kcounts <- kcount(tmp, k = 5)
+
+
 # generate k-mer distance matrices
 x.dist <- kdistance(x, method = "edgar")
 xDNA.dist <- kdistance(xDNA, method = "edgar")
