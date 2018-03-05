@@ -1,14 +1,14 @@
 Package: kmer
 Type: Package
 Title: Fast K-mer Counting and Clustering for Biological Sequence Analysis
-Version: 1.0.0
+Version: 1.0.0.9000
 Authors@R: person("Shaun", "Wilkinson", role = c("aut", "cre"),
                      email = "shaunpwilkinson@gmail.com")
 Author: Shaun Wilkinson [aut, cre]
 Maintainer: Shaun Wilkinson <shaunpwilkinson@gmail.com>
-Description: Contains a suite of tools for rapidly computing 
-    distance matrices and building large trees using fast alignment-free 
-    'k-mer' counting and divisive clustering techniques.
+Description: Contains tools for rapidly computing distance matrices 
+    and clustering large sequence datasets using fast alignment-free 
+    k-mer counting and recursive k-means partitioning.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
