@@ -16,16 +16,20 @@ recursive k-means partitioning.
 
 
 ### Installation
-`kmer` is currently available as a development version, with a stable
-release available on CRAN shortly. To download the package from 
-GitHub users will first need to ensure they have a C/C++ compliler and the 
-[devtools](https://github.com/hadley/devtools) R package installed. 
-Linux users will generally have a compiler such as `gcc` installed by default; 
-however Windows users will need to download 
+To download `kmer` from CRAN and load the package, run
+```R
+install.packages("kmer")
+library("kmer")
+```
+To download the development version from 
+GitHub, first ensure a C/C++ compliler is available and the 
+[devtools](https://github.com/hadley/devtools) R package is installed. 
+Linux users will generally have a compiler installed by default; 
+however Windows users may need to download 
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/) and Mac 
 OSX users will need [Xcode](https://developer.apple.com/xcode) 
-(note that Rtools and Xcode are not R packages). To download and install 
-devtools, run 
+(note that these are not R packages). 
+To download and install devtools, run 
 ```R
 install.packages("devtools")
 ``` 
