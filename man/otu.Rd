@@ -40,7 +40,7 @@ This function performs divisive heirarchical clustering on a set of
   returning an integer vector of OTU membership.
 }
 \details{
-This function clusters sequences into OTUS by first
+This function clusters sequences into OTUs by first
   generating a matrix of k-mer counts, and then splitting the matrix
   into two subsets (row-wise) using the k-means algorithm (\emph{k} = 2).
   The splitting continues recursively until the farthest k-mer distance

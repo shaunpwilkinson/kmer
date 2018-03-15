@@ -23,7 +23,7 @@
 #' @return a named integer vector of cluster membership with values ranging from 1 to
 #'   the total number of OTUs. Asterisks indicate the representative sequence within
 #'   each cluster.
-#' @details This function clusters sequences into OTUS by first
+#' @details This function clusters sequences into OTUs by first
 #'   generating a matrix of k-mer counts, and then splitting the matrix
 #'   into two subsets (row-wise) using the k-means algorithm (\emph{k} = 2).
 #'   The splitting continues recursively until the farthest k-mer distance
@@ -106,7 +106,7 @@ otu <- function(x, k = 5, threshold = 0.97, residues = NULL, gap = "-", ...){
   attr(tree, "leaf") <- TRUE
   attr(tree, "sequences") <- seq_along(x)
   attr(tree, "height") <- 10
-  otun <- function(node, kcs, seqlengths, k, threshold){
+  otun <- function(node, kcs, seqlengths, k, threshold, ...){
     if(!is.list(node)){
       if(length(attr(node, "sequences")) > 1){
         ## fork leaves only
@@ -141,13 +141,14 @@ otu <- function(x, k = 5, threshold = 0.97, residues = NULL, gap = "-", ...){
     }
     return(node)
   }
-  otur <- function(tree, kcs, seqlengths, k, threshold){ # kcs is the kcount matrix
-    tree <- otun(tree, kcs, seqlengths, k, threshold)
-    if(is.list(tree)) tree[] <- lapply(tree, otur, kcs, seqlengths, k, threshold)
+  otur <- function(tree, kcs, seqlengths, k, threshold, ...){ # kcs is the kcount matrix
+    tree <- otun(tree, kcs, seqlengths, k, threshold, ...)
+    if(is.list(tree)) tree[] <- lapply(tree, otur, kcs, seqlengths, k, threshold, ...)
     return(tree)
   }
   ##  build tree recursively
-  tree <- otur(tree, kcs = kcounts, seqlengths = xlengths, k = k, threshold = threshold)
+  tree <- otur(tree, kcs = kcounts, seqlengths = xlengths, k = k,
+               threshold = threshold, ... = ...)
   class(tree) <- "dendrogram"
   counter <- 1
   fun <- function(node){
