@@ -1,3 +1,25 @@
+#Submission 3
+This is a patch release addressing a bug in "otu" that prevented 
+additional arguments being passed to nested functions via "dots":
+
+### Test environments
+ * local ubuntu 16.04.2 x86_64-pc-linux-gnu; R version 3.4.0 
+ * travis-ci ubuntu 14.04.5 x86_64-pc-linux-gnu; R 3.4.2
+ * winbuilder devel (2018-03-16 r74345)
+ 
+### R CMD check results
+There were no ERRORs or WARNINGs.
+There was one NOTE:
+* checking CRAN incoming feasibility ... NOTE 
+Maintainer: ‘Shaun Wilkinson <shaunpwilkinson@gmail.com>’
+This is safe to ignore. 
+
+### Downstream dependencies
+This is a new package, there are currently no dependencies.  
+ 
+
+--------------------------------------------------------------------------------
+
 #Submission 2
 This is the second submission on 6 Mar 2018 with two changes made on Swetlana's request:
 
