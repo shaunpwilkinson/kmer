@@ -282,6 +282,7 @@
   return(res)
 }
 
+## y is a kmer count matrix (not row-normalized)
 .central1 <- function(y, k, seqlengths){
   y <- as.matrix(y) # in case y is a df
   means <- apply(y, 2, mean)
