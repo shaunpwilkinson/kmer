@@ -166,77 +166,87 @@ otu <- function(x, k = 5, threshold = 0.97, residues = NULL, gap = "-", ...){
   tree <- sort(unlist(tree, use.names = TRUE))
   centrals <- grepl("\\*$", names(tree))
   res <- as.integer(gsub("\\*$", "", names(tree)))
-  names(res) <- names(x)
-  names(res)[centrals] <- paste0(names(res)[centrals], "*")
-
-  repseqs <- x[centrals]
-  kcounts <- as.matrix(kcounts)
-  repd <- kmer::kdistance(repseqs, k = k, residues = residues, gap = gap)
-  repc <- as.dendrogram(hclust(repd, method = "average"))
-
-  collapse <- function(node, otus, kcs, seqlengths, threshold, k){
-    #needs joinlist and counter in parent env
-    if(is.list(node)){
-      if(is.null(attr(node, "lock")) & is.leaf(node[[1]]) & is.leaf(node[[2]])){
-        cand1 <- paste0(attr(node[[1]], "label"), "*")
-        cand2 <- paste0(attr(node[[2]], "label"), "*")
-        froms <- unname(which(otus == otus[cand1]))
-        tos <- unname(which(otus == otus[cand2]))
-        cand12kd <- .kdist(kcs, from = froms - 1, to = tos - 1, seqlengths = seqlengths, k = k)
-        if(max(cand12kd) < 1 - threshold){
-          fromtos <- c(froms, tos)
-          central <- .central1(kcs[fromtos, ], k = k, seqlengths = seqlengths[fromtos])
-          newelement <- list(newgrpmembrs = fromtos, newcentral = central,
-                             newgrpno = min(otus[fromtos]))#, maxdist = max(cand12kd))
-          joinlist[[counter]] <<- newelement
-          counter <<- counter + 1
-          tmpattr <- attributes(node)
-          node <- 1
-          attr(node, "leaf") <- TRUE
-          attr(node, "label") <- names(central)
-          attr(node, "midpoint") <- tmpattr$midpoint
-          attr(node, "height") <- tmpattr$height
-          attr(node, "members") <- 1
-          attr(node, "class") <- "dendrogram"
-        }else{
-          attr(node, "lock") <- TRUE
-        }
-      }
-    }
-    return(node)
-  }
-  collapser <- function(tree, otus, kcs, seqlengths, threshold, k){
-    tree <- collapse(tree, otus, kcs, seqlengths, threshold, k)
-    if(is.list(tree)) tree[] <- lapply(tree, collapser, otus, kcs, seqlengths, threshold, k)
-    return(tree)
-  }
-  repeat{
-    joinlist <- list()
-    counter <- 1
-    repc <- collapser(repc, otus = res, kcs = kcounts, seqlengths = xlengths,
-                      threshold = threshold, k = k)
-    if(length(joinlist) == 0 | is.leaf(repc)) break
-    for(i in seq_along(joinlist)){
-      ngmi <- joinlist[[i]][["newgrpmembrs"]] # new group members
-      ngci <- joinlist[[i]][["newcentral"]] # new group center i
-      ngno <- joinlist[[i]][["newgrpno"]] # new group number
-      names(res)[ngmi] <- gsub("\\*$", "", names(res)[ngmi]) # remove all asterisks
-      names(res)[ngmi][ngci] <- paste0(names(res)[ngmi][ngci], "*") # attach to new group centre
-      res[ngmi] <- ngno
-    }
-  }
-  # need to fill gaps
-  missings <- which(!seq(1, max(res)) %in% res)
-  for(i in seq_along(missings)){
-    res[res > missings[i]] <- res[res > missings[i]] - 1
-    missings <- missings - 1
-  }
-  centrals <- names(res)[grepl("\\*$", names(res))]
-  centrals <- gsub("\\*$", "", centrals) # character
   res <- res[pointers]
-  cinds <- match(centrals, catchnames) # central indices in derep'd x
+  cinds <- match(names(x)[centrals], catchnames) # central indices in derep'd x
   catchnames[cinds] <- paste0(catchnames[cinds], "*")
   names(res) <- catchnames
   return(res)
 }
 ################################################################################
+
+
+#
+# tree <- dendrapply(tree, fun)
+# tree <- sort(unlist(tree, use.names = TRUE))
+# centrals <- grepl("\\*$", names(tree))
+# res <- as.integer(gsub("\\*$", "", names(tree)))
+# names(res) <- names(x)
+# names(res)[centrals] <- paste0(names(res)[centrals], "*")
+#
+# repseqs <- x[centrals]
+# kcounts <- as.matrix(kcounts)
+# repd <- kmer::kdistance(repseqs, k = k, residues = residues, gap = gap)
+# repc <- as.dendrogram(hclust(repd, method = "average"))
+# collapse <- function(node, otus, kcs, seqlengths, threshold, k){
+#   #needs joinlist and counter in parent env
+#   if(is.list(node)){
+#     if(is.null(attr(node, "lock")) & is.leaf(node[[1]]) & is.leaf(node[[2]])){
+#       cand1 <- paste0(attr(node[[1]], "label"), "*")
+#       cand2 <- paste0(attr(node[[2]], "label"), "*")
+#       froms <- unname(which(otus == otus[cand1]))
+#       tos <- unname(which(otus == otus[cand2]))
+#       cand12kd <- .kdist(kcs, from = froms - 1, to = tos - 1, seqlengths = seqlengths, k = k)
+#       if(max(cand12kd) < 1 - threshold){
+#         fromtos <- c(froms, tos)
+#         central <- .central1(kcs[fromtos, ], k = k, seqlengths = seqlengths[fromtos])
+#         newelement <- list(newgrpmembrs = fromtos, newcentral = central,
+#                            newgrpno = min(otus[fromtos]))#, maxdist = max(cand12kd))
+#         joinlist[[counter]] <<- newelement
+#         counter <<- counter + 1
+#         tmpattr <- attributes(node)
+#         node <- 1
+#         attr(node, "leaf") <- TRUE
+#         attr(node, "label") <- names(central)
+#         attr(node, "midpoint") <- tmpattr$midpoint
+#         attr(node, "height") <- tmpattr$height
+#         attr(node, "members") <- 1
+#         attr(node, "class") <- "dendrogram"
+#       }else{
+#         attr(node, "lock") <- TRUE
+#       }
+#     }
+#   }
+#   return(node)
+# }
+# collapser <- function(tree, otus, kcs, seqlengths, threshold, k){
+#   tree <- collapse(tree, otus, kcs, seqlengths, threshold, k)
+#   if(is.list(tree)) tree[] <- lapply(tree, collapser, otus, kcs, seqlengths, threshold, k)
+#   return(tree)
+# }
+# repeat{
+#   joinlist <- list()
+#   counter <- 1
+#   repc <- collapser(repc, otus = res, kcs = kcounts, seqlengths = xlengths,
+#                     threshold = threshold, k = k)
+#   if(length(joinlist) == 0 | is.leaf(repc)) break
+#   for(i in seq_along(joinlist)){
+#     ngmi <- joinlist[[i]][["newgrpmembrs"]] # new group members
+#     ngci <- joinlist[[i]][["newcentral"]] # new group center i
+#     ngno <- joinlist[[i]][["newgrpno"]] # new group number
+#     names(res)[ngmi] <- gsub("\\*$", "", names(res)[ngmi]) # remove all asterisks
+#     names(res)[ngmi][ngci] <- paste0(names(res)[ngmi][ngci], "*") # attach to new group centre
+#     res[ngmi] <- ngno
+#   }
+# }# need to fill gaps
+# missings <- which(!seq(1, max(res)) %in% res)
+# for(i in seq_along(missings)){
+#   res[res > missings[i]] <- res[res > missings[i]] - 1
+#   missings <- missings - 1
+# }
+# centrals <- names(res)[grepl("\\*$", names(res))]
+# centrals <- gsub("\\*$", "", centrals) # character
+# res <- res[pointers]
+# cinds <- match(centrals, catchnames) # central indices in derep'd x
+# catchnames[cinds] <- paste0(catchnames[cinds], "*")
+# names(res) <- catchnames
+# return(res)
