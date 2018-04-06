@@ -22,6 +22,9 @@
 #'   Defaults to "-" otherwise.
 #' @param named logical. Should the k-mers be returned as column names in
 #'   the returned matrix? Defaults to TRUE.
+#' @param compress logical indicating whether to compress AAbin sequences
+#'   using the Dayhoff(6) alphabet for k-mer sizes exceeding 4.
+#'   Defaults to TRUE to avoid memory overflow and excessive computation time.
 #' @return Returns a matrix of k-mer counts with one row for each sequence
 #'   and \emph{n}^\emph{k} columns (where \emph{n} is the size of the
 #'   residue alphabet and \emph{k} is the k-mer size)
@@ -75,7 +78,7 @@
 #'   y
 #'   ## 400 columns for amino acid 2-mers AA, AB, ... , YY
 ################################################################################
-kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE){
+kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE, compress = TRUE){
   DNA <- .isDNA(x)
   AA <- .isAA(x)
   if(DNA) class(x) <- "DNAbin" else if(AA) class(x) <- "AAbin"
@@ -83,6 +86,8 @@ kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE){
   gap <- if(AA) as.raw(45) else if(DNA) as.raw(4) else gap
   if(is.matrix(x)) x <- .unalign(x, gap = gap)
   if(!is.list(x)) x <- list(x)
+  x <- lapply(x, function(s) s[s != gap])
+  if(DNA) class(x) <- "DNAbin" else if(AA) class(x) <- "AAbin"
   nseq <- length(x)
   if(is.null(names(x))) names(x) <- paste0("S", 1:nseq)
   seqalongx <- seq_along(x)
@@ -101,7 +106,14 @@ kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE){
       return(res)
     }
     if(AA){
-      arity <- if(k > 4) 6 else 20 # compress AA alphabet for high k values
+      if(k > 4 & compress){
+        cat("Converting to Dayhoff(6) compressed alphabet for k > 4\n")
+        cat("Classes: AGPST, C, DENQ, FWY, HKR, ILMV")
+        residues <- c("A", "C", "D", "F", "H", "I")
+        arity <- 6
+      }else{
+        arity <- 20
+      }
       x <- .encodeAA(x, arity = arity, na.rm = TRUE)
     }else{
       arity <- length(residues)

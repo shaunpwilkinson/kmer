@@ -74,6 +74,7 @@
 }
 
 # Remove ambiguous residues from amino acid sequence
+
 .disambiguateAA <- function(a, probs = rep(0.05, 20), random = TRUE){
   # a is a raw byte in AAbin format
   guide <- as.raw(c(65:90, 42, 45)) #length = 28
@@ -107,8 +108,8 @@
     return(nonambigs[9]) # K (Lysine)
   }else if(a == guide[21]){# U (Selenocysteine)
     return(nonambigs[2]) #C )(Cysteine)
-  }else if(a == guide[27] | a == guide[28]) {
-    return(NULL)
+  }else if(a == guide[27] | a == guide[28]){
+    return(as.raw(0)) # note NULL cant be used with sapply, list cant be simplified.
   }else stop("invalid byte for class 'AAbin'")
 }
 
@@ -118,9 +119,10 @@
   # arity is an integer, either 20, 22, 24, 26, 27, or 6 (Dayhoff6 compression)
   if(is.null(probs)) probs <- rep(0.05, 20)
   if(arity == 20){
-    fun <- function(v){
+    fun20 <- function(v, probs, random, na.rm){
       ambigs <- !(v %in% as.raw((65:89)[-c(2, 10, 15, 21, 24)]))
-      if(any(ambigs)) v[ambigs] <- sapply(v[ambigs], .disambiguateAA, probs)
+      if(any(ambigs)) v[ambigs] <- sapply(v[ambigs], .disambiguateAA, probs, random)
+      v <- v[v != as.raw(0)]
       bits <- (65:89)[-c(2, 10, 15, 21, 24)]
       ints <- 0:19
       res <- ints[match(as.numeric(v), bits)]
@@ -128,13 +130,19 @@
       if(na.rm) if(any(is.na(res))) res <- res[!is.na(res)]
       return(res)
     }
+    if(is.list(x)){
+      res <- lapply(x, fun20, probs, random, na.rm)
+    }else{
+      res <- fun20(x, probs, random, na.rm)
+    }
+    return(res)
   }else if(arity == 22){
     # for use with Gonnet matrix
     # return order "C" "S" "T" "P" "A" "G" "N" "D" "E" "Q" "H" "R"
     # "K" "M" "I" "L" "V" "F" "Y" "W" "X" "*"
     # Ambig codes B, J and Z, special codes O and Z, are returned as 20 (X),
     # and gaps are returned as NA
-    fun <- function(v){
+    fun22 <- function(v){
       bits <- c(67, 83, 84, 80, 65, 71, 78, 68, 69, 81, 72, 82, 75, 77,
                 73, 76, 86, 70, 89, 87, 88, 42, 66, 74, 79, 85, 90)
       ints <- c(0:21, rep(20, 5))
@@ -144,13 +152,15 @@
       if(na.rm) if(any(isnares)) res <- res[!isnares]
       return(res)
     }
+    res <- if(is.list(x)) lapply(x, fun22) else fun22(x)
+    return(res)
   }else if(arity == 24){
     # for use with PAM and BLOSUM matrices
     # return order "A" "R" "N" "D" "C" "Q" "E" "G" "H" "I" "L" "K" "M"
     # "F" "P" "S" "T" "W" "Y" "V" "B" "Z" "X" "*"
     # Ambig code J, and special codes O and U are returned as 22 (X).
     # Gaps are returned as NA or removed if na.rm = T
-    fun <- function(v){
+    fun24 <- function(v){
       bits <- c(65, 82, 78, 68, 67, 81, 69, 71, 72, 73, 76, 75,
                 77, 70, 80, 83, 84, 87, 89, 86, 66, 90, 88, 42, 74, 79, 85)
       ints <- c(0:23, 22, 22, 22)
@@ -160,19 +170,23 @@
       if(na.rm) if(any(isnares)) res <- res[!isnares]
       return(res)
     }
+    res <- if(is.list(x)) lapply(x, fun24) else fun24(x)
+    return(res)
   }else if(arity == 26){
     ### return order = LETTERS
-    fun <- function(v){
+    fun26 <- function(v){
       res <- as.integer(v) - 65
       res[res < 0 | res > 25] <- NA
       attributes(res) <- attributes(unclass(v))
       if(na.rm) if(any(is.na(res))) res <- res[!is.na(res)]
       return(res)
     }
+    res <- if(is.list(x)) lapply(x, fun26) else fun26(x)
+    return(res)
   }else if(arity == 27){
     ### return order ACDEFGHIKLMNPQRSTVWY, X, BJZ, OU, *
     ### for input into .probAA
-    fun <- function(v){
+    fun27 <- function(v){
       bits <- c(65, 67, 68, 69, 70, 71, 72, 73, 75, 76, 77, 78, 80,
                 81, 82, 83, 84, 86, 87, 89, 88, 66, 74, 90,  79,85, 42)
       ints <- c(0:26)
@@ -182,8 +196,10 @@
       if(na.rm) if(any(isnares)) res <- res[!isnares]
       return(res)
     }
+    res <- if(is.list(x)) lapply(x, fun27) else fun27(x)
+    return(res)
   }else if(arity == 6){
-    fun <- function(v){
+    fun6 <- function(v){
       v <- unclass(v)
       bits <- 65:90
       ints <- c(0, 2, 1, 2, 2, 3, 0, 4, 5, 5, 4, 5, 5, 2, 4, 0, 2, 4, 0, 0, 1, 5, 3, NA, 3, 2)
@@ -192,8 +208,9 @@
       if(na.rm) if(any(is.na(res))) res <- res[!is.na(res)]
       return(res)
     }
+    res <- if(is.list(x)) lapply(x, fun6) else fun6(x)
+    return(res)
   }else stop("invalid 'arity' argument")
-  if(is.list(x)) lapply(x, fun) else fun(x)
 }
 
 # Convert character sequence to integers
