@@ -101,7 +101,7 @@ kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE){
       return(res)
     }
     if(AA){
-      arity <- if(k > 3) 6 else 20 # compress AA alphabet for high k values
+      arity <- if(k > 4) 6 else 20 # compress AA alphabet for high k values
       x <- .encodeAA(x, arity = arity, na.rm = TRUE)
     }else{
       arity <- length(residues)
