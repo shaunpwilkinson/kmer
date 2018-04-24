@@ -3,6 +3,7 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/kmer)](https://cran.r-project.org/package=kmer)
 [![](http://cranlogs.r-pkg.org/badges/grand-total/kmer)](https://cran.r-project.org/package=kmer)
 [![Build Status](https://travis-ci.org/shaunpwilkinson/kmer.svg?branch=master)](https://travis-ci.org/shaunpwilkinson/kmer)
+[![DOI](https://zenodo.org/badge/121723365.svg)](https://zenodo.org/badge/latestdoi/121723365)
 [![codecov](https://codecov.io/github/shaunpwilkinson/kmer/branch/master/graphs/badge.svg)](https://codecov.io/github/shaunpwilkinson/kmer)
 [![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)

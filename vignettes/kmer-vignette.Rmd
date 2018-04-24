@@ -250,7 +250,7 @@ concordance with the topology of Figure 1c.
 
 
 ##Concluding remarks
-The **kmer** package is released underthe GPL-3 license, and is free to distribute
+The **kmer** package is released under the GPL-3 license, and is free to distribute
 under certain conditions; however it comes with no warranty. Please direct bug 
 reports to the GitHub issues page at <http://github.com/shaunpwilkinson/kmer/issues>.
 Any feedback is greatly appreciated.

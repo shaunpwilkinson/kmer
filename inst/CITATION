@@ -5,6 +5,7 @@ citEntry(entry = "Manual",
    author = personList(as.person("Shaun Wilkinson")),
    url = "https://cran.r-project.org/package=kmer",
    year   = "2018",
+   doi = "10.5281/zenodo.1227690"
    textVersion =
    paste("Wilkinson SP (2018) kmer: an R package for fast alignment-free clustering
          of biological sequences. R package version 1.0.0.",
