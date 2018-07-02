@@ -7,8 +7,17 @@
 #' @param x a "DNAbin" object.
 #' @param k integer giving the k-mer size used to generate the input matrix
 #'   for k-means clustering.
-#' @param threshold numeric between 0 and 1 giving the OTU similarity cutoff.
+#' @param threshold numeric between 0 and 1 giving the OTU identity cutoff.
 #'   Defaults to 0.97.
+#' @param method the maximum distance criterion to use for terminating the
+#'   recursive partitioning procedure. Accepted options are "central" (splitting
+#'   stops if the similarity between the central sequence
+#'   and its farthest neighbor within the cluster is greater than the threshold),
+#'   "centroid" (splitting stops if the similarity between the centroid
+#'   and its farthest neighbor within the cluster is greater than the threshold),
+#'   and "farthest" (splitting
+#'   stops if the similarity between the two farthest sequences within the cluster
+#'   is greater than the threshold). Defaults to "central".
 #' @param residues either NULL (default; emitted residues are automatically
 #'   detected from the sequences), a case sensitive character vector
 #'   specifying the residue alphabet, or one of the character strings
@@ -86,7 +95,8 @@
 #' woodmouse.OTUs
 #' }
 ################################################################################
-otu <- function(x, k = 5, threshold = 0.97, residues = NULL, gap = "-", ...){
+otu <- function(x, k = 5, threshold = 0.97, method = "central", residues = NULL,
+                gap = "-", ...){
   DNA <- .isDNA(x)
   AA <- .isAA(x)
   if(DNA) class(x) <- "DNAbin" else if(AA) class(x) <- "AAbin"
@@ -106,16 +116,30 @@ otu <- function(x, k = 5, threshold = 0.97, residues = NULL, gap = "-", ...){
   attr(tree, "leaf") <- TRUE
   attr(tree, "sequences") <- seq_along(x)
   attr(tree, "height") <- 10
-  otun <- function(node, kcs, seqlengths, k, threshold, ...){
+  otun <- function(node, kcounts, seqlengths, k, threshold, ...){
     if(!is.list(node)){
       if(length(attr(node, "sequences")) > 1){
         ## fork leaves only
-        seqs <- kcs[attr(node, "sequences"), , drop = FALSE]
+        seqs <- kcounts[attr(node, "sequences"), , drop = FALSE]
         lens <- seqlengths[attr(node, "sequences")]
-        fths <- .farthest2(seqs, k = k, seqlengths = lens)
-        if(attr(fths, "distance") <= dthresh){
-          attr(node, "central") <- .central1(seqs, k = k, seqlengths = lens)
-          return(node)
+        if(method == "farthest"){
+          fths <- .farthest2(seqs, k = k, seqlengths = lens)
+          if(attr(fths, "distance") <= dthresh){
+            attr(node, "central") <- .central1(seqs, k = k, seqlengths = lens, maxdist_central = FALSE)
+            return(node)
+          }
+        }else if(method == "central"){
+          cseq <- .central1(seqs, k = k, seqlengths = lens, maxdist_central = TRUE)
+          if(attr(cseq, "maxdist_central") <= dthresh){
+            attr(node, "central") <- cseq[1]
+            return(node)
+          }
+        }else if(method == "centroid"){
+          cseq <- .central1(seqs, k = k, seqlengths = lens, maxdist_central = FALSE)
+          if(attr(cseq, "maxdist_centroid") <= dthresh){
+            attr(node, "central") <- cseq[1]
+            return(node)
+          }
         }
         km <- if(nrow(seqs) > 2){
           tryCatch(kmeans(seqs, centers = 2, ... = ...),
@@ -141,13 +165,13 @@ otu <- function(x, k = 5, threshold = 0.97, residues = NULL, gap = "-", ...){
     }
     return(node)
   }
-  otur <- function(tree, kcs, seqlengths, k, threshold, ...){ # kcs is the kcount matrix
-    tree <- otun(tree, kcs, seqlengths, k, threshold, ...)
-    if(is.list(tree)) tree[] <- lapply(tree, otur, kcs, seqlengths, k, threshold, ...)
+  otur <- function(tree, kcounts, seqlengths, k, threshold, ...){
+    tree <- otun(tree, kcounts, seqlengths, k, threshold, ...)
+    if(is.list(tree)) tree[] <- lapply(tree, otur, kcounts, seqlengths, k, threshold, ...)
     return(tree)
   }
   ##  build tree recursively
-  tree <- otur(tree, kcs = kcounts, seqlengths = xlengths, k = k,
+  tree <- otur(tree, kcounts = kcounts, seqlengths = xlengths, k = k,
                threshold = threshold, ... = ...)
   class(tree) <- "dendrogram"
   counter <- 1
@@ -173,80 +197,3 @@ otu <- function(x, k = 5, threshold = 0.97, residues = NULL, gap = "-", ...){
   return(res)
 }
 ################################################################################
-
-
-#
-# tree <- dendrapply(tree, fun)
-# tree <- sort(unlist(tree, use.names = TRUE))
-# centrals <- grepl("\\*$", names(tree))
-# res <- as.integer(gsub("\\*$", "", names(tree)))
-# names(res) <- names(x)
-# names(res)[centrals] <- paste0(names(res)[centrals], "*")
-#
-# repseqs <- x[centrals]
-# kcounts <- as.matrix(kcounts)
-# repd <- kmer::kdistance(repseqs, k = k, residues = residues, gap = gap)
-# repc <- as.dendrogram(hclust(repd, method = "average"))
-# collapse <- function(node, otus, kcs, seqlengths, threshold, k){
-#   #needs joinlist and counter in parent env
-#   if(is.list(node)){
-#     if(is.null(attr(node, "lock")) & is.leaf(node[[1]]) & is.leaf(node[[2]])){
-#       cand1 <- paste0(attr(node[[1]], "label"), "*")
-#       cand2 <- paste0(attr(node[[2]], "label"), "*")
-#       froms <- unname(which(otus == otus[cand1]))
-#       tos <- unname(which(otus == otus[cand2]))
-#       cand12kd <- .kdist(kcs, from = froms - 1, to = tos - 1, seqlengths = seqlengths, k = k)
-#       if(max(cand12kd) < 1 - threshold){
-#         fromtos <- c(froms, tos)
-#         central <- .central1(kcs[fromtos, ], k = k, seqlengths = seqlengths[fromtos])
-#         newelement <- list(newgrpmembrs = fromtos, newcentral = central,
-#                            newgrpno = min(otus[fromtos]))#, maxdist = max(cand12kd))
-#         joinlist[[counter]] <<- newelement
-#         counter <<- counter + 1
-#         tmpattr <- attributes(node)
-#         node <- 1
-#         attr(node, "leaf") <- TRUE
-#         attr(node, "label") <- names(central)
-#         attr(node, "midpoint") <- tmpattr$midpoint
-#         attr(node, "height") <- tmpattr$height
-#         attr(node, "members") <- 1
-#         attr(node, "class") <- "dendrogram"
-#       }else{
-#         attr(node, "lock") <- TRUE
-#       }
-#     }
-#   }
-#   return(node)
-# }
-# collapser <- function(tree, otus, kcs, seqlengths, threshold, k){
-#   tree <- collapse(tree, otus, kcs, seqlengths, threshold, k)
-#   if(is.list(tree)) tree[] <- lapply(tree, collapser, otus, kcs, seqlengths, threshold, k)
-#   return(tree)
-# }
-# repeat{
-#   joinlist <- list()
-#   counter <- 1
-#   repc <- collapser(repc, otus = res, kcs = kcounts, seqlengths = xlengths,
-#                     threshold = threshold, k = k)
-#   if(length(joinlist) == 0 | is.leaf(repc)) break
-#   for(i in seq_along(joinlist)){
-#     ngmi <- joinlist[[i]][["newgrpmembrs"]] # new group members
-#     ngci <- joinlist[[i]][["newcentral"]] # new group center i
-#     ngno <- joinlist[[i]][["newgrpno"]] # new group number
-#     names(res)[ngmi] <- gsub("\\*$", "", names(res)[ngmi]) # remove all asterisks
-#     names(res)[ngmi][ngci] <- paste0(names(res)[ngmi][ngci], "*") # attach to new group centre
-#     res[ngmi] <- ngno
-#   }
-# }# need to fill gaps
-# missings <- which(!seq(1, max(res)) %in% res)
-# for(i in seq_along(missings)){
-#   res[res > missings[i]] <- res[res > missings[i]] - 1
-#   missings <- missings - 1
-# }
-# centrals <- names(res)[grepl("\\*$", names(res))]
-# centrals <- gsub("\\*$", "", centrals) # character
-# res <- res[pointers]
-# cinds <- match(centrals, catchnames) # central indices in derep'd x
-# catchnames[cinds] <- paste0(catchnames[cinds], "*")
-# names(res) <- catchnames
-# return(res)

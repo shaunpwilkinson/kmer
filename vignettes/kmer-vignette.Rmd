@@ -1,5 +1,5 @@
 ---
-title: "kmer: an R package for fast alignment-free clustering of biological sequences"
+title: "Introduction to the kmer package"
 author: "Shaun Wilkinson"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -17,33 +17,18 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
 --------------------------------------------------------------------------------
-## Abstract
-**Summary:** The **kmer** package contains functions for rapidly 
-computing distance matrices and clustering biological sequence datasets 
-in R, using fast alignment-free *k*-mer counting.
-This package has a range of applications including 
-OTU clustering, classification trees, and phylogenetic 
-analysis of very large biological sequence datasets.  
-**Availability and Implementation:** The **kmer** package is 
-released under the GPL-3 license, and is available for download from 
-CRAN <https://CRAN.R-project.org/package=kmer> and github 
-<https://github.com/shaunpwilkinson/kmer>.  
-**Contact:** shaunpwilkinson\@gmail.com
-
 
 ## Introduction
-As biological sequence datasets continue to increase in size due to 
-high-throughput sequencing, traditional clustering 
-methods based on multiple sequence alignments, pairwise
-distance matrices, and agglomerative (bottom-up) tree-building methods
-can become computationally infeasible.
-Alternative k-mer counting methods involve enumerating all 
+Traditional clustering methods based on multiple sequence alignments, pairwise
+distance matrices, and agglomerative (bottom-up) tree-building methods are often 
+computationally infeasible for large, high-throughput DNA and RNA datasets.
+Alternative k-mer based clustering methods involve enumerating all 
 *k*-letter words in a sequence through a sliding window of length *k*.
 The $n \times 4^k$ matrix of *k*-mer counts 
-(where $n$ is the number of sequences)
-can then be used in place of a multiple sequence alignment to 
+(where $n$ is the number of sequences).
+The matrix of kmer counts can then be used in place of a multiple sequence alignment to 
 calculate distances and/or build a phylogenetic tree. 
-Here, we introduce **kmer**, an R package for clustering large 
+**kmer** is an R package for clustering large 
 sequence datasets using fast alignment-free *k*-mer counting. 
 This can be achieved with or without a multiple sequence alignment, 
 and with or without a matrix of pairwise distances.
@@ -211,7 +196,7 @@ plot(tree3, horiz = TRUE, yaxt = "n",
 par(op)
 ```
 
-**Figure 1:** Comparison of clustering methods for woodmouse sequences 
+**Figure 1:** Comparison of clustering methods for woodmouse sequences. 
 The top-down and neighbor-joining trees show relatively congruent fine-scale 
 topologies, regardless of the distance measure and method used.
 However, for large sequence sets, the top-down (divisive) method builds trees 
@@ -219,6 +204,8 @@ orders of magnitude faster than
 traditional alignment and distance matrix-based methods, since computation 
 time and memory use increasing linearly rather than quadratically with *n*.
 
+\
+\
 
 This package also features the function `otu` for rapid clustering of sequences
 into operational taxonomic units based on a genetic distance (k-mer distance)
@@ -237,7 +224,7 @@ taxonomic units with a threshold of 0.97 (k-mer distance with k = 5) and
 with 20 random starts per k-means split (recommended for improved accuracy). 
 ```{r}
 set.seed(999)
-woodmouse.OTUs <- otu(woodmouse, k = 5, threshold = 0.97, nstart = 20)
+woodmouse.OTUs <- otu(woodmouse, k = 5, threshold = 0.97, method = "farthest", nstart = 20)
 woodmouse.OTUs
 ```
 The function outputs a named integer vector of OTU membership, with

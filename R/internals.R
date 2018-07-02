@@ -255,17 +255,23 @@
 
 # Find MD5 hash
 .digest <- function(x){
-  digest1 <- function(s){
-    if(mode(s) != "raw"){
-      if(mode(s) == "character"){
-        s <- charToRaw(paste0(s, collapse = ""))
-      }else if(mode(s) == "integer"){
-        s <- as.raw(s)
-      }else stop("x must be raw, character or integer\n")
+  if(.isDNA(x)){
+    x <- .dna2char(x)
+  }else if(.isAA(x)){
+    x <- .aa2char(x)
+  }else if(is.list(x)){
+    if(length(x) == 0) return(NULL)
+    if(length(x[[1]] > 1)){
+      x <- vapply(x, paste0, "", collapse = "")
+    }else{
+      x <- vapply(x, head, "", 1)
     }
-    return(paste(openssl::md5(as.vector(s))))
   }
-  sapply(x, digest1)
+  if(mode(x) != "character") stop("sequences must be in raw or character format\n")
+  tmpnames <- names(x)
+  res <- openssl::md5(x)
+  names(res) <- tmpnames
+  return(res)
 }
 
 # Find re-replication indices
@@ -276,7 +282,9 @@
   unname(pointers[h])
 }
 
-.farthest2 <- function(y, k, seqlengths){ # y is a kcount (or other) matrix
+# y is a kcount (or other) matrix
+# returns two element integer vector giving
+.farthest2 <- function(y, k, seqlengths){
   y <- as.matrix(y) # in case y is a df
   point1 <- sample(1:nrow(y), size = 1)
   checked <- integer(100)
@@ -300,12 +308,46 @@
 }
 
 ## y is a kmer count matrix (not row-normalized)
-.central1 <- function(y, k, seqlengths){
+## returns integer giving row of most central seq
+.central1 <- function(y, k, seqlengths, maxdist_central = FALSE){
   y <- as.matrix(y) # in case y is a df
+  stopifnot(nrow(y) > 0)
+  if(nrow(y) == 2){
+    res <- 1
+    dis <- .kdist(y, from = 0, to = 1, seqlengths = seqlengths, k = k)[1, ]
+    attr(res, "maxdist_centroid") <- dis/2
+    if(maxdist_central) attr(res, "maxdist_central") <- dis
+    return(res)
+  }
   means <- apply(y, 2, mean)
   y2 <- rbind(means, y)
   dists <- .kdist(y2, from = 0, to = 1:nrow(y),
                   seqlengths = c(mean(seqlengths), seqlengths),
                   k = k)[1, ]
-  which.min(dists)
+  res <- which.min(dists)
+  attr(res, "maxdist_centroid") <- max(dists)
+  if(maxdist_central){
+    dists2 <- .kdist(y, from = res - 1, to = seq(0, nrow(y) - 1),
+                     seqlengths = seqlengths,
+                     k = k)[1, ]
+    attr(res, "maxdist_central") <- max(dists2)
+  }
+  return(res)
 }
+
+
+.dna2char <- function(x){
+  cbytes <- as.raw(c(65, 84, 71, 67, 83, 87, 82, 89, 75, 77, 66, 86, 72, 68, 78, 45, 63))
+  indices <- c(136, 24, 72, 40, 96, 144, 192, 48, 80 ,160, 112, 224, 176, 208, 240, 4, 2)
+  vec <- raw(240)
+  vec[indices] <- cbytes
+  if(is.list(x)){
+    fun <- function(s, vec) rawToChar(vec[as.integer(s)])
+    res <- vapply(x, fun, "", vec)
+  }else{
+    res <- rawToChar(vec[as.integer(x)])
+  }
+  return(res)
+}
+
+.aa2char <- function(x) if(is.list(x)) vapply(x, rawToChar, "") else rawToChar(x)

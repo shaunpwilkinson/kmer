@@ -4,7 +4,8 @@
 \alias{otu}
 \title{Cluster sequences into operational taxonomic units.}
 \usage{
-otu(x, k = 5, threshold = 0.97, residues = NULL, gap = "-", ...)
+otu(x, k = 5, threshold = 0.97, method = "central", residues = NULL,
+  gap = "-", ...)
 }
 \arguments{
 \item{x}{a "DNAbin" object.}
@@ -12,8 +13,18 @@ otu(x, k = 5, threshold = 0.97, residues = NULL, gap = "-", ...)
 \item{k}{integer giving the k-mer size used to generate the input matrix
 for k-means clustering.}
 
-\item{threshold}{numeric between 0 and 1 giving the OTU similarity cutoff.
+\item{threshold}{numeric between 0 and 1 giving the OTU identity cutoff.
 Defaults to 0.97.}
+
+\item{method}{the maximum distance criterion to use for terminating the
+recursive partitioning procedure. Accepted options are "central" (splitting
+stops if the similarity between the central sequence
+and its farthest neighbor within the cluster is greater than the threshold),
+"centroid" (splitting stops if the similarity between the centroid
+and its farthest neighbor within the cluster is greater than the threshold),
+and "farthest" (splitting
+stops if the similarity between the two farthest sequences within the cluster
+is greater than the threshold). Defaults to "central".}
 
 \item{residues}{either NULL (default; emitted residues are automatically
 detected from the sequences), a case sensitive character vector
