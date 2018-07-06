@@ -92,6 +92,7 @@ kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE, compress 
   if(is.null(names(x))) names(x) <- paste0("S", 1:nseq)
   seqalongx <- seq_along(x)
   if(DNA){
+    if(k > 12) stop("Maximum kmer size is 12 for DNA\n")
     arity <- 4
     x <- lapply(x, function(s) s[!(s %in% as.raw(c(2, 4, 240)))])
     seqlengths <- sapply(x, length)
@@ -172,9 +173,11 @@ kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE, compress 
 #' @param gap the character used to represent gaps in the alignment matrix
 #'   (if applicable). Ignored for \code{"DNAbin"} or \code{"AAbin"} objects.
 #'   Defaults to "-" otherwise.
+#' @param compress logical indicating whether to compress AAbin sequences
+#'   using the Dayhoff(6) alphabet for k-mer sizes exceeding 4.
+#'   Defaults to TRUE to avoid memory overflow and excessive computation time.
 #' @param ... further arguments to be passed to \code{"as.dist"}.
 #' @return an object of class \code{"dist"}.
-#'
 #' @details
 #'   This function computes the \emph{n} * \emph{n} k-mer distance matrix
 #'   (where \emph{n} is the number of sequences), returning an object of class
@@ -227,7 +230,7 @@ kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE, compress 
 #'   plot(woodmouse.tree)
 ################################################################################
 kdistance <- function(x, k = 5, method = "edgar", residues = NULL,
-                      gap = "-", ...){
+                      gap = "-", compress = TRUE, ...){
   DNA <- .isDNA(x)
   AA <- .isAA(x)
   if(DNA) class(x) <- "DNAbin" else if(AA) class(x) <- "AAbin"
@@ -237,7 +240,7 @@ kdistance <- function(x, k = 5, method = "edgar", residues = NULL,
   nseq <- length(x)
   if(is.null(names(x))) names(x) <- paste0("S", 1:nseq)
   seqalongx <- seq_along(x)
-  kcounts <- kcount(x, k = k, residues = residues, gap = gap)
+  kcounts <- kcount(x, k = k, residues = residues, gap = gap, compress = compress)
   seqlengths <- apply(kcounts, 1, sum) + k - 1
   ## not sapply(x, length) in case of gaps, unknowns etc
   ## which will be picked up by kcount

@@ -10,6 +10,7 @@
 [![ORCiD](https://img.shields.io/badge/ORCiD-0000--0002--7332--7931-brightgreen.svg)](http://orcid.org/0000-0002-7332-7931)
 
 --------------------------------------------------------------------------------
+
 K-mer counting and clustering for biological sequence analysis  
 
 `kmer` is an R package for rapidly computing distance matrices and 
@@ -49,7 +50,7 @@ library("kmer")
 
 ### Help
 
-An overview of the package and it's functions can be found by running
+An overview of the package and its functions can be found by running
 ```R
 ?kmer
 ```

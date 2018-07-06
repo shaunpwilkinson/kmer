@@ -1,3 +1,10 @@
+# kmer 1.1.0
+
+* Added "central", "centroid" and "farthest" options for OTU clustering
+* Increased sequence hashing speed
+* Edits made to vignette to improve clarity
+* Enforced a maximum kmer size of 12 for DNA to avoid overflow
+
 # kmer 1.0.2
 
 * Resolved bug in **kcount** where sequence disambiguation was prevented by 

@@ -22,7 +22,7 @@
 #' @details This function creates a tree by successively splitting
 #'   the dataset into smaller and smaller subsets (recursive
 #'   partitioning). This is a divisive, or "top-down" approach to tree-building,
-#'   as opposed to agglomerative "bottom-up" methods such as neighbour joining
+#'   as opposed to agglomerative "bottom-up" methods such as neighbor joining
 #'   and UPGMA. It is particularly useful for large large datasets with many sequences
 #'   (\emph{n} > 10,000) since the need to compute a large \emph{n} * \emph{n}
 #'   distance matrix is circumvented.

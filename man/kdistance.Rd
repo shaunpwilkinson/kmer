@@ -4,7 +4,8 @@
 \alias{kdistance}
 \title{K-mer distance matrix computation.}
 \usage{
-kdistance(x, k = 5, method = "edgar", residues = NULL, gap = "-", ...)
+kdistance(x, k = 5, method = "edgar", residues = NULL, gap = "-",
+  compress = TRUE, ...)
 }
 \arguments{
 \item{x}{a matrix of aligned sequences or a list of unaligned sequences.
@@ -33,6 +34,10 @@ recommended unless x is a "DNAbin" or "AAbin" object.}
 \item{gap}{the character used to represent gaps in the alignment matrix
 (if applicable). Ignored for \code{"DNAbin"} or \code{"AAbin"} objects.
 Defaults to "-" otherwise.}
+
+\item{compress}{logical indicating whether to compress AAbin sequences
+using the Dayhoff(6) alphabet for k-mer sizes exceeding 4.
+Defaults to TRUE to avoid memory overflow and excessive computation time.}
 
 \item{...}{further arguments to be passed to \code{"as.dist"}.}
 }
