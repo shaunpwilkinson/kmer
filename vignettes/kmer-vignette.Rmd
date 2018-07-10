@@ -87,13 +87,12 @@ originally published in Michaux et al. [-@Michaux2003].
 While the **kmer** distance functions do not require sequences to 
 be aligned, this example will enable us to compare the performance of the 
 *k*-mer distances with the alignment-dependent distances produced by 
-`ape::dist.dna`. First, load the dataset as follows:
+`ape::dist.dna`. First, load the dataset and view the first few rows and 
+columns as follows:
 
 ```{r}
-library(ape)
-data(woodmouse)
-## view the first few rows and columns 
-as.character.DNAbin(woodmouse[1:5, 1:5])
+data(woodmouse, package = "ape")
+ape::as.character.DNAbin(woodmouse[1:5, 1:5])
 ```
 
 
@@ -138,20 +137,20 @@ The resulting neighbor-joining trees are visualized using the
 
 ```{r, message = FALSE, fig.height=4, fig.width=10, fig.align='left', out.width= '700px'}
 ## compute pairwise distance matrices
-woodmouse.dist <- ape::dist.dna(woodmouse, model = "K80") 
-woodmouse.kdist <- kdistance(woodmouse, k = 11) 
+dist1 <- ape::dist.dna(woodmouse, model = "K80") 
+dist2 <- kdistance(woodmouse, k = 7) 
 
 ## build neighbor-joining trees
-phy1 <- ape::nj(woodmouse.dist)
-phy2 <- ape::nj(woodmouse.kdist)
+phy1 <- ape::nj(dist1)
+phy2 <- ape::nj(dist2)
 
 ## rearrange trees in ladderized fashion
-dnd1 <- ape::ladderize(phy1)
-dnd2 <- ape::ladderize(phy2)
+phy1 <- ape::ladderize(phy1)
+phy2 <- ape::ladderize(phy2)
 
 ## convert phylo objects to dendrograms
-dnd1 <- phylogram::as.dendrogram(phy1)
-dnd2 <- phylogram::as.dendrogram(phy2)
+dnd1 <- as.dendrogram(phy1)
+dnd2 <- as.dendrogram(phy2)
 
 ## plot the tanglegram
 dndlist <- dendextend::dendlist(dnd1, dnd2)
