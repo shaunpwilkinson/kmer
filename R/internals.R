@@ -121,7 +121,7 @@
   if(arity == 20){
     fun20 <- function(v, probs, random, na.rm){
       ambigs <- !(v %in% as.raw((65:89)[-c(2, 10, 15, 21, 24)]))
-      if(any(ambigs)) v[ambigs] <- sapply(v[ambigs], .disambiguateAA, probs, random)
+      if(any(ambigs)) v[ambigs] <- sapply(unclass(v[ambigs]), .disambiguateAA, probs, random)
       v <- v[v != as.raw(0)]
       bits <- (65:89)[-c(2, 10, 15, 21, 24)]
       ints <- 0:19
