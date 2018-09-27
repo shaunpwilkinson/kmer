@@ -4,8 +4,8 @@
 \alias{otu}
 \title{Cluster sequences into operational taxonomic units.}
 \usage{
-otu(x, k = 5, threshold = 0.97, method = "central", residues = NULL,
-  gap = "-", ...)
+otu(x, k = 5, threshold = 0.97, method = "central",
+  residues = NULL, gap = "-", ...)
 }
 \arguments{
 \item{x}{a "DNAbin" object.}
