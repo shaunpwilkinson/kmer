@@ -23,8 +23,8 @@
 #' @param named logical. Should the k-mers be returned as column names in
 #'   the returned matrix? Defaults to TRUE.
 #' @param compress logical indicating whether to compress AAbin sequences
-#'   using the Dayhoff(6) alphabet for k-mer sizes exceeding 4.
-#'   Defaults to TRUE to avoid memory overflow and excessive computation time.
+#'   using the Dayhoff(6) alphabet.
+#'   Avoids memory overflow and excessive computation time for high values of k.
 #' @return Returns a matrix of k-mer counts with one row for each sequence
 #'   and \emph{n}^\emph{k} columns (where \emph{n} is the size of the
 #'   residue alphabet and \emph{k} is the k-mer size)
@@ -78,7 +78,8 @@
 #'   y
 #'   ## 400 columns for amino acid 2-mers AA, AB, ... , YY
 ################################################################################
-kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE, compress = TRUE){
+kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE,
+                   compress = k > 3){
   DNA <- .isDNA(x)
   AA <- .isAA(x)
   if(DNA) class(x) <- "DNAbin" else if(AA) class(x) <- "AAbin"
@@ -107,7 +108,7 @@ kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE, compress 
       return(res)
     }
     if(AA){
-      if(k > 3 & compress){
+      if(compress){
         message("Converting to Dayhoff(6) compressed alphabet for k > 3")
         message("Classes: AGPST, C, DENQ, FWY, HKR, ILMV")
         residues <- c("A", "C", "D", "F", "H", "I")
