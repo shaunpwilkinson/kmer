@@ -108,8 +108,8 @@ kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE, compress 
     }
     if(AA){
       if(k > 4 & compress){
-        message("Converting to Dayhoff(6) compressed alphabet for k > 4\n")
-        message("Classes: AGPST, C, DENQ, FWY, HKR, ILMV\n")
+        message("Converting to Dayhoff(6) compressed alphabet for k > 4")
+        message("Classes: AGPST, C, DENQ, FWY, HKR, ILMV")
         residues <- c("A", "C", "D", "F", "H", "I")
         arity <- 6
       }else{
