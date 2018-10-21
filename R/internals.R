@@ -351,3 +351,48 @@
 }
 
 .aa2char <- function(x) if(is.list(x)) vapply(x, rawToChar, "") else rawToChar(x)
+
+
+#' @noRd
+.encodekc <- function(xx){  ## kmer count matrix
+  if(mode(xx) == "raw") return(xx)
+  xx <- round(xx)
+  if(ncol(xx) %% 2 == 1) xx <- cbind(xx, 0L)
+  xx[xx > 15] <- 15
+  dimnames(xx) <- NULL
+  dims <- dim(xx)
+  xx <- as.raw(xx)
+  dim(xx) <- dims
+  fun <- function(xxx){ # 2-col int mat
+    m1 <- matrix(rawToBits(xxx[, 1]), ncol = 8, byrow = TRUE)[, 1:4]
+    m2 <- matrix(rawToBits(xxx[, 2]), ncol = 8, byrow = TRUE)[, 1:4]
+    return(packBits(t(cbind(m2, m1))))
+  }
+  res <- matrix(as.raw(0), nrow = dims[1], ncol = dims[2]/2)
+  guide <- split(seq(1, dims[2]), f = rep(seq(1, dims[2]/2), each = 2))
+  for(i in seq_along(guide)){
+    res[, i] <- fun(xx[, guide[[i]]])
+  }
+  return(res)
+}
+
+#' @noRd
+.decodekc <- function(zz){ ## kmer count matrix (max count 15)
+  if(mode(zz) != "raw") return(zz)
+  dims <- dim(zz)
+  fun <- function(zzz){
+    # takes a raw vector
+    # returns a 2 col matrix
+    mymat <- matrix(rawToBits(zzz), ncol = 8L, byrow = TRUE)
+    m1 <- m2 <- matrix(as.raw(0L), ncol = 8L, nrow = nrow(mymat))
+    m1[, 1:4] <- mymat[, 5:8]
+    m2[, 1:4] <- mymat[, 1:4]
+    m1 <- as.integer(packBits(t(m1)))
+    m2 <- as.integer(packBits(t(m2)))
+    return(cbind(m1, m2))
+  }
+  guide <- split(seq(1, dims[2] * 2), f = rep(seq(1, dims[2]), each = 2))
+  out <- matrix(0L, nrow = dims[1], ncol = dims[2] * 2)
+  for(i in seq_along(guide)) out[, guide[[i]]] <- fun(zz[, i])
+  return(out)
+}

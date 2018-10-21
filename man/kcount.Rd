@@ -5,7 +5,7 @@
 \title{K-mer counting.}
 \usage{
 kcount(x, k = 5, residues = NULL, gap = "-", named = TRUE,
-  compress = TRUE)
+  compress = TRUE, encode = FALSE)
 }
 \arguments{
 \item{x}{a matrix of aligned sequences, a list of unaligned sequences,
@@ -35,6 +35,10 @@ the returned matrix? Defaults to TRUE.}
 \item{compress}{logical indicating whether to compress AAbin sequences
 using the Dayhoff(6) alphabet for k-mer sizes exceeding 4.
 Defaults to TRUE to avoid memory overflow and excessive computation time.}
+
+\item{encode}{logical indicating if the resulting matrix should be encoded
+in raw bytes (output matrix can be decoded with \code{kmer:::.decodekc()}).
+Note that the output will be rounded and have maximum k-mer count of 15.}
 }
 \value{
 Returns a matrix of k-mer counts with one row for each sequence

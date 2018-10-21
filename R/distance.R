@@ -25,6 +25,9 @@
 #' @param compress logical indicating whether to compress AAbin sequences
 #'   using the Dayhoff(6) alphabet for k-mer sizes exceeding 4.
 #'   Defaults to TRUE to avoid memory overflow and excessive computation time.
+#' @param encode logical indicating if the resulting matrix should be encoded
+#'   in raw bytes (output matrix can be decoded with \code{kmer:::.decodekc()}).
+#'   Note that the output will be rounded and have maximum k-mer count of 15.
 #' @return Returns a matrix of k-mer counts with one row for each sequence
 #'   and \emph{n}^\emph{k} columns (where \emph{n} is the size of the
 #'   residue alphabet and \emph{k} is the k-mer size)
@@ -78,7 +81,16 @@
 #'   y
 #'   ## 400 columns for amino acid 2-mers AA, AB, ... , YY
 ################################################################################
-kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE, compress = TRUE){
+kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE,
+                   compress = TRUE, encode = FALSE){
+  if(length(x) > 10000){
+    nmats <- length(x) %/% 10000 + 1
+    f <- rep(seq_len(nmats), each = 10000)[seq_along(x)]
+    y <- split(x, f)
+    kcounts <- lapply(y, kcount, k, residues, gap, named, compress, encode)
+    kcounts <- do.call("rbind", kcounts)
+    return(kcounts)
+  }
   DNA <- .isDNA(x)
   AA <- .isAA(x)
   if(DNA) class(x) <- "DNAbin" else if(AA) class(x) <- "AAbin"
@@ -143,6 +155,7 @@ kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE, compress 
   colnames(kcounts) <- if(named){
     apply(indices, 2, function(i) paste0(residues[i], collapse = ""))
   }else NULL
+  if(encode) kcounts <- .encodekc(kcounts)
   return(kcounts)
 }
 ################################################################################
