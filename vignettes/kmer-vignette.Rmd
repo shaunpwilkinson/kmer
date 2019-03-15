@@ -121,6 +121,7 @@ woodmouse.kdist <- kdistance(woodmouse, k = 6)
 print(as.matrix(woodmouse.kdist)[1:7, 1:7], digits = 2)
 
 ### Compute and print the embedded distance matrix
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 seeds <- sample(1:15, size = 3)
 woodmouse.mbed <- mbed(woodmouse, seeds = seeds, k = 6)
@@ -161,8 +162,7 @@ dendextend::tanglegram(dndlist, fast = TRUE, margin_inner = 5)
 
 **Figure 1:** Tanglegram comparing distance measures for the woodmouse sequences. 
 Neighbor-joining trees derived from the alignment-dependent (left) and alignment-free (right) 
-distances show relatively congruent fine-scale topologies, with the exception of the single
-sequence No0908S.
+distances show congruent topologies.
 
 
 \
@@ -203,6 +203,7 @@ taxonomic units (OTUs) with a maximum within-cluster *k*-mer distance of 0.03
 and with 20 random starts per k-means split (recommended for improved accuracy).
 
 ```{r}
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 woodmouse.OTUs <- otu(woodmouse, k = 5, threshold = 0.97, method = "farthest", nstart = 20)
 woodmouse.OTUs

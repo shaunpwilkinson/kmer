@@ -1,12 +1,11 @@
-# kmer version 1.1.0
+# kmer version 1.1.1
 
-This is a minor release providing additional arguments for `otu`, 
-implementing some speed enhancements, and improving the readability 
-of the vignette.
+This version specifies previous version of set.seed sampler with RNGversion() calls
+as requested by Kurt Hornik on 2019-03-07
 
 ## Test environments
 
- * local ubuntu 16.04.2 x86_64-pc-linux-gnu; R version 3.4.0 
+ * local ubuntu 16.04.2 x86_64-pc-linux-gnu; R version 3.5.2 
  * travis-ci ubuntu 14.04.5 x86_64-pc-linux-gnu; R 3.4.4
  * winbuilder devel R version 3.5.1 (2018-07-01 r74950)
 
@@ -17,5 +16,6 @@ There were no ERRORs WARNINGs or NOTEs.
 ## Downstream dependencies
 
 - aphid:  OK
+- insect: OK
 
 

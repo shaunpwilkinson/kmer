@@ -121,7 +121,7 @@ kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE,
     if(AA){
       if(k > 3 & compress){
         message("Converting to Dayhoff(6) compressed alphabet for k > 3")
-        message("Classes: AGPST, C, DENQ, FWY, HKR, ILMV")
+        message("Classes: AGPST, C, DENQ, FWY, HKR, ILMV\n")
         residues <- c("A", "C", "D", "F", "H", "I")
         arity <- 6
       }else{
@@ -381,6 +381,7 @@ kdistance <- function(x, k = 5, method = "edgar", residues = NULL,
 #'   library(ape)
 #'   data(woodmouse)
 #'   ## randomly select three sequences as seeds
+#'   suppressWarnings(RNGversion("3.5.0"))
 #'   set.seed(999)
 #'   seeds <- sample(1:15, size = 3)
 #'   ## embed the woodmouse dataset in three dimensions

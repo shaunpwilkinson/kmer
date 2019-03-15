@@ -109,6 +109,7 @@ This function computes a \emph{n} * log(\emph{n}, 2)^2 k-mer distance matrix
   library(ape)
   data(woodmouse)
   ## randomly select three sequences as seeds
+  suppressWarnings(RNGversion("3.5.0"))
   set.seed(999)
   seeds <- sample(1:15, size = 3)
   ## embed the woodmouse dataset in three dimensions

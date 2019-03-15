@@ -2,6 +2,7 @@ library(kmer)
 context("distance computation and tree building")
 
 # simulate a DNA sequence dataset
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 bases <- c("A", "C", "G", "T")
 x <- list(sample(bases, replace = TRUE, size = 100))
@@ -14,6 +15,7 @@ xDNA <- lapply(x, function(s) rawbases[match(s, bases)])
 class(xDNA) <- "DNAbin"
 
 # simulate an AA sequence dataset this time an alignment
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 aminos <- LETTERS[-c(2, 10, 15, 21, 24, 26)]
 y <- matrix(sample(aminos, replace = TRUE, size = 100), nrow = 1)
@@ -44,32 +46,44 @@ y.dist <- kdistance(y, method = "edgar", k = 2)
 yAA.dist <- kdistance(yAA, method = "edgar", k = 2)
 
 # embed sequences
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 x.mbed <- mbed(x)
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 xDNA.mbed <- mbed(xDNA)
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 y.mbed <- mbed(y, k = 2)
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 yAA.mbed <- mbed(y, k = 2)
 
 # build divisive trees
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 x.tree <- cluster(x, nstart = 20)
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 xDNA.tree <- cluster(xDNA, nstart = 20)
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 y.tree <- cluster(y, nstart = 20, k = 2)
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 yAA.tree <- cluster(yAA, nstart = 20, k = 2)
 
 # OTU clustering
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 x.otu <- otu(x, nstart = 20)
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 xDNA.otu <- otu(xDNA, nstart = 20)
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 y.otu <- otu(y, nstart = 20, k = 2)
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 yAA.otu <- otu(yAA, nstart = 20, k = 2)
 

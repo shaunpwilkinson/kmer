@@ -90,6 +90,7 @@
 #' ## trim gappy ends to subset global alignment
 #' woodmouse <- woodmouse[, apply(woodmouse, 2, function(v) !any(v == 0xf0))]
 #' ## cluster sequences into OTUs at 0.97 threshold with kmer size = 5
+#' suppressWarnings(RNGversion("3.5.0"))
 #' set.seed(999)
 #' woodmouse.OTUs <- otu(woodmouse, k = 5, threshold = 0.97, nstart = 20)
 #' woodmouse.OTUs

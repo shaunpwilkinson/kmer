@@ -1,3 +1,7 @@
+# kmer 1.1.1
+
+* Specified previous version of set.seed sampler with RNGversion() calls
+
 # kmer 1.1.0
 
 * Added "central", "centroid" and "farthest" options for OTU clustering

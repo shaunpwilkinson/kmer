@@ -78,6 +78,7 @@ data(woodmouse)
 ## trim gappy ends to subset global alignment
 woodmouse <- woodmouse[, apply(woodmouse, 2, function(v) !any(v == 0xf0))]
 ## build tree divisively
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(999)
 woodmouse.tree <- cluster(woodmouse, nstart = 5)
 ## plot tree
