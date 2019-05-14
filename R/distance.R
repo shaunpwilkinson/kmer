@@ -83,14 +83,7 @@
 ################################################################################
 kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE,
                    compress = TRUE, encode = FALSE){
-  if(length(x) > 10000){
-    nmats <- length(x) %/% 10000 + 1
-    f <- rep(seq_len(nmats), each = 10000)[seq_along(x)]
-    y <- split(x, f)
-    kcounts <- lapply(y, kcount, k, residues, gap, named, compress, encode)
-    kcounts <- do.call("rbind", kcounts)
-    return(kcounts)
-  }
+
   DNA <- .isDNA(x)
   AA <- .isAA(x)
   if(DNA) class(x) <- "DNAbin" else if(AA) class(x) <- "AAbin"
@@ -100,6 +93,15 @@ kcount <- function(x, k = 5, residues = NULL, gap = "-", named = TRUE,
   if(!is.list(x)) x <- list(x)
   x <- lapply(x, function(s) s[s != gap])
   if(DNA) class(x) <- "DNAbin" else if(AA) class(x) <- "AAbin"
+  ## divide job to prevent overflow
+  if(length(x) > 10000){
+    nmats <- length(x) %/% 10000 + 1
+    f <- rep(seq_len(nmats), each = 10000)[seq_along(x)]
+    y <- split(x, f)
+    kcounts <- lapply(y, kcount, k, residues, gap, named, compress, encode)
+    kcounts <- do.call("rbind", kcounts)
+    return(kcounts)
+  }
   nseq <- length(x)
   if(is.null(names(x))) names(x) <- paste0("S", 1:nseq)
   seqalongx <- seq_along(x)
