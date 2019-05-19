@@ -1,7 +1,7 @@
 Package: kmer
 Type: Package
 Title: Fast K-Mer Counting and Clustering for Biological Sequence Analysis
-Version: 1.1.1.9000
+Version: 1.1.2
 Authors@R: person("Shaun", "Wilkinson", role = c("aut", "cre"),
                      email = "shaunpwilkinson@gmail.com")
 Author: Shaun Wilkinson [aut, cre]
