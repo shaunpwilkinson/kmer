@@ -1,3 +1,9 @@
+# kmer 1.1.2 (2019-05-20)
+
+* Fixed a bug in `kcount` that was preventing the deconstruction of alignments prior to kmer counting.
+  Thanks to Prof. Gianluigi Cardinali for the bug report
+
+
 # kmer 1.1.1
 
 * Specified previous version of set.seed sampler with RNGversion() calls
