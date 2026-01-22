@@ -4,8 +4,15 @@
 \alias{kcount}
 \title{K-mer counting.}
 \usage{
-kcount(x, k = 5, residues = NULL, gap = "-", named = TRUE,
-  compress = TRUE, encode = FALSE)
+kcount(
+  x,
+  k = 5,
+  residues = NULL,
+  gap = "-",
+  named = TRUE,
+  compress = TRUE,
+  encode = FALSE
+)
 }
 \arguments{
 \item{x}{a matrix of aligned sequences, a list of unaligned sequences,

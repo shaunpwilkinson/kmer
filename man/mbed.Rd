@@ -4,8 +4,7 @@
 \alias{mbed}
 \title{Convert sequences to vectors of distances to a subset of seed sequences.}
 \usage{
-mbed(x, seeds = NULL, k = 5, residues = NULL, gap = "-",
-  counts = FALSE)
+mbed(x, seeds = NULL, k = 5, residues = NULL, gap = "-", counts = FALSE)
 }
 \arguments{
 \item{x}{a matrix of aligned sequences or a list of unaligned sequences.

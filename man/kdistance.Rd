@@ -4,8 +4,15 @@
 \alias{kdistance}
 \title{K-mer distance matrix computation.}
 \usage{
-kdistance(x, k = 5, method = "edgar", residues = NULL, gap = "-",
-  compress = TRUE, ...)
+kdistance(
+  x,
+  k = 5,
+  method = "edgar",
+  residues = NULL,
+  gap = "-",
+  compress = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{a matrix of aligned sequences or a list of unaligned sequences.
