@@ -1,13 +1,11 @@
 # kmer
 
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/kmer)](https://cran.r-project.org/package=kmer)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/kmer)](https://cran.r-project.org/package=kmer)
 [![](http://cranlogs.r-pkg.org/badges/grand-total/kmer)](https://cran.r-project.org/package=kmer)
-[![Build Status](https://travis-ci.org/shaunpwilkinson/kmer.svg?branch=master)](https://travis-ci.org/shaunpwilkinson/kmer)
 [![DOI](https://zenodo.org/badge/121723365.svg)](https://zenodo.org/badge/latestdoi/121723365)
-[![codecov](https://codecov.io/github/shaunpwilkinson/kmer/branch/master/graphs/badge.svg)](https://codecov.io/github/shaunpwilkinson/kmer)
-[![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
-[![ORCiD](https://img.shields.io/badge/ORCiD-0000--0002--7332--7931-brightgreen.svg)](http://orcid.org/0000-0002-7332-7931)
+[![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![ORCiD](https://img.shields.io/badge/ORCiD-0000--0002--7332--7931-brightgreen.svg)](https://orcid.org/0000-0002-7332-7931)
 
 --------------------------------------------------------------------------------
 
@@ -62,12 +60,12 @@ vignette("kmer-vignette")
 or access it directly from [CRAN](https://CRAN.R-project.org/package=kmer).
 
 If you experience a problem using this package please feel free to
-raise it as an issue on [GitHub](http://github.com/shaunpwilkinson/kmer/issues).
+raise it as an issue on [GitHub](https://github.com/shaunpwilkinson/kmer/issues).
 Any feedback is appreciated.
 
 ### Acknowledgements
 
 This software was developed at 
-[Victoria University of Wellington](http://www.victoria.ac.nz/) 
+[Victoria University of Wellington](https://www.wgtn.ac.nz/) 
 with funding from a Rutherford Foundation Postdoctoral Research Fellowship 
 award from the Royal Society of New Zealand.

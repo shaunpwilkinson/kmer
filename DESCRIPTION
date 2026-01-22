@@ -15,8 +15,8 @@ Description: Contains tools for rapidly computing distance matrices
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-URL: http://github.com/shaunpwilkinson/kmer
-BugReports: http://github.com/shaunpwilkinson/kmer/issues
+URL: https://github.com/shaunpwilkinson/kmer
+BugReports: https://github.com/shaunpwilkinson/kmer/issues
 Imports: 
     openssl,
     phylogram,

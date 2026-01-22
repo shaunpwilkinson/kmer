@@ -1,8 +1,8 @@
 citHeader("To cite kmer in publications use:")
 
-citEntry(entry = "Manual",
+bibentry(entry = "Manual",
    title = "kmer: an R package for fast alignment-free clustering of biological sequences",
-   author = personList(as.person("Shaun Wilkinson")),
+   author = c("Shaun Wilkinson"),
    url = "https://cran.r-project.org/package=kmer",
    year   = "2018",
    doi = "10.5281/zenodo.1227690",
