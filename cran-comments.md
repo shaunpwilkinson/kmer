@@ -6,11 +6,12 @@ This version fixes an issue reported by the CRAN team where the now obsolete C++
 ## Test environments
 
  * local Ubuntu 24.04.1 LTS x86_64-pc-linux-gnu (64-bit) R version 4.3.3 (2024-02-29)
- * winbuilder R devel  (2019-05-19 r76539)
+ * local Windows 11 x64 (build 22631) R version 4.4.0 (2024-04-24 ucrt)
+ * winbuilder R devel (2026-01-21 r89314 ucrt)
 
 ## R CMD check results
 
-There were no ERRORs WARNINGs or NOTEs.
+There were no ERRORs or WARNINGs
 
 ## Downstream dependencies
 

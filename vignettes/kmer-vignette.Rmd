@@ -220,7 +220,7 @@ concordance with the consensus topology of Figure 1.
 
 ##Concluding remarks
 The **kmer** package is released under the GPL-3 license. Please direct bug 
-reports to the GitHub issues page at <http://github.com/shaunpwilkinson/kmer/issues>.
+reports to the GitHub issues page at <https://github.com/shaunpwilkinson/kmer/issues>.
 Any feedback is greatly appreciated.
 
 

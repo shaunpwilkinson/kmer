@@ -27,7 +27,7 @@ library("kmer")
 
 To download the development version from 
 GitHub, first ensure a C/C++ compliler is available and the 
-[devtools](https://github.com/hadley/devtools) R package is installed. 
+[devtools](https://github.com/r-lib/devtools) R package is installed. 
 Linux users will generally have a compiler installed by default; 
 however Windows users may need to download 
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/) and Mac 
