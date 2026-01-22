@@ -1,2 +1,3 @@
 ## C++11 necessary to avoid 'long long int' compilation error
-CXX_STD = CXX11
+## Note commented out Jan 12 2026 on request from CRAN team SW
+## CXX_STD = CXX11
